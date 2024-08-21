@@ -9,7 +9,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',           // Standardbenutzername für XAMPP
     password: '',           // Standardpasswort für XAMPP ist leer, falls geändert, anpassen
-    database: 'mqtt_data'   // Name der bestehenden Datenbank
+    database: 'diplomarbeit'   // Name der bestehenden Datenbank
 });
 
 // Verbindung zur Datenbank herstellen
