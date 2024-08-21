@@ -1,4 +1,5 @@
 ToDo:
+
 Anpassung ChatGPT Code
 
 Testen mit Luca
