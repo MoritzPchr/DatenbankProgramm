@@ -4,7 +4,7 @@ Testen mit Luca
 
 Hochladen auf die Datenbank
 
-<h2>Verbesserungen im Code:</h2><br>
+<h2>ToDo-Verbesserungen im Code:</h2><br>
     MQTT-Überlastung<br>
     Verschlüsselung MQTT und MySQL<br>
     Datenbankverbindungsdetails verstecken (mit dotenv)<br>
