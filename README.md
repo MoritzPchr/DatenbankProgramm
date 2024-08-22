@@ -1,7 +1,12 @@
 ToDo:
 
-Anpassung ChatGPT Code
-
 Testen mit Luca
 
-Testen der Datenbank Verbindung
+Hochladen auf die Datenbank
+
+Verbesserungen im Code:
+    MQTT-Überlastung<br>
+    Verschlüsselung MQTT und MySQL<br>
+     Datenbankverbindungsdetails verstecken (mit dotenv)<br>
+     SQL-Injection verhindern
+

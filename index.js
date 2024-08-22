@@ -2,7 +2,10 @@ const mqtt = require('mqtt');
 const mysql = require('mysql2');
 
 // MQTT Client konfigurieren
-const client = mqtt.connect('mqtt://broker.hivemq.com'); // Beispielbroker
+const client = mqtt.connect('mqtt://broker.hivemq.com'); // Beispeilsbroker IP
+//const client = mqtt.connect('mqtt://192.10.10.10');
+//const client = mqtt.connect('mqtt://192.10.10.10:1883'); --> mit Angabe des Portes
+
 
 // Verbindung zur MySQL-Datenbank auf localhost (XAMPP)
 const db = mysql.createConnection({
@@ -24,7 +27,7 @@ db.connect((err) => {
 // Verbindung zum MQTT-Broker herstellen
 client.on('connect', () => {
     console.log('Connected to MQTT broker');
-    client.subscribe('sensor/temperature', (err) => {
+    client.subscribe('sensor/temperature', (err) => { //Topic angeben
         if (err) {
             console.error('Subscription error:', err);
         } else {
@@ -37,6 +40,7 @@ client.on('connect', () => {
 client.on('message', (topic, message) => {
     console.log(`Received message: ${message.toString()} on topic: ${topic}`);
 
+    /*
     const sql = `INSERT INTO sensor_data (topic, message) VALUES (?, ?)`;
     db.query(sql, [topic, message.toString()], (err, results) => {
         if (err) {
@@ -44,7 +48,7 @@ client.on('message', (topic, message) => {
             return;
         }
         console.log(`Data inserted with ID: ${results.insertId}`);
-    });
+    });*/
 });
 
 // Handle process exit to close DB connection
