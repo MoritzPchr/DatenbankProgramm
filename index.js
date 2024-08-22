@@ -31,7 +31,7 @@ client.on('connect', () => {
         if (err) {
             console.error('Subscription error:', err);
         } else {
-            console.log('Subscribed to topic: sensor/temperature');
+            console.log('Subscribed to topic.');
         }
     });
 });
