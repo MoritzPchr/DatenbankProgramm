@@ -1,7 +1,5 @@
 <h1>ToDo:</h1>
 
-Testen mit Luca
-
 Hochladen auf die Datenbank
 
 <h2>ToDo-Verbesserungen im Code:</h2><br>
