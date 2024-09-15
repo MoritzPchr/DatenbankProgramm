@@ -36,19 +36,10 @@ client.on('connect', () => {
     });
 });
 
-// Nachricht empfangen und in die Datenbank speichern
+// Nachricht empfangen
 client.on('message', (topic, message) => {
     console.log(`Received message: ${message.toString()} on topic: ${topic}`);
-
-    /*
-    const sql = `INSERT INTO sensor_data (topic, message) VALUES (?, ?)`;
-    db.query(sql, [topic, message.toString()], (err, results) => {
-        if (err) {
-            console.error('Error inserting data:', err.message);
-            return;
-        }
-        console.log(`Data inserted with ID: ${results.insertId}`);
-    });*/
+    uploadMessage(message);
 });
 
 // Handle process exit to close DB connection
@@ -61,3 +52,55 @@ process.on('SIGINT', () => {
         process.exit(0);
     });
 });
+
+//In die Datenbank speichern
+async function uploadMessage(message) {
+    try {
+        const parsedMessage = JSON.parse(message.toString());
+
+        // Extrahiere die Werte aus dem JSON
+        let { Id, PM1_0, PM2_5, PM10 } = parsedMessage;
+
+        // Überprüfen ob Client existiert:
+        const clientExists = await checkClient(Id);
+        
+        if (clientExists) {
+            console.log("Client vorhanden");
+
+            // SQL-Abfrage zum Einfügen der Daten in die Datenbank
+            let sql = `INSERT INTO feinstaubwert (\`PM1.0\`, \`PM2.5\`, PM10, ClientID) VALUES (?, ?, ?, ?)`;
+            db.query(sql, [PM1_0, PM2_5, PM10, Id], (err, results) => {
+                if (err) {
+                    console.error('Fehler beim Einfügen der Daten:', err.message);
+                    return;
+                }
+                console.log(`Daten eingefügt mit ID: ${results.insertId}`);
+            });
+        } else {
+            console.log("Client nicht vorhanden!");
+        }
+    } catch (err) {
+        console.error('Fehler beim Verarbeiten der Nachricht:', err.message);
+    }
+}
+
+async function checkClient(Id) {
+    let sql = `SELECT EXISTS(SELECT 1 FROM client WHERE ClientID = ?) AS existsResult`;
+
+    try {
+        const [result] = await db.promise().query(sql, [Id]);
+        let exists = result[0].existsResult;
+        return exists === 1; // Gibt true zurück, wenn der Client existiert, sonst false
+    } catch (err) {
+        console.error("Fehler bei der Client-Abfrage:", err.message);
+        throw err;
+    }
+}
+
+
+//-----------------------------------------------------------------------------------
+//XXXXXXXXXX
+//Zur Simulation:
+//XXXXXXXXXXX
+const messageTEST = '{"Id":"11","PM1_0":0,"PM2_5":0,"PM10":34}';
+uploadMessage(messageTEST);
