@@ -1,5 +1,7 @@
 const mqtt = require('mqtt');
 const mysql = require('mysql2');
+const Ajv = require('ajv');
+const ajv = new Ajv();
 
 // MQTT Client konfigurieren
 //const client = mqtt.connect('mqtt://broker.hivemq.com'); // Beispeilsbroker IP
@@ -58,6 +60,12 @@ async function uploadMessage(message) {
     try {
         const parsedMessage = JSON.parse(message.toString());
 
+        //JSON-Kontrolle:
+        if (!validateMessage(parsedMessage)) {
+            console.error('Ungültiges JSON-Format:', parsedMessage);
+            return;
+        }
+
         // Extrahiere die Werte aus dem JSON
         let { Id, PM1_0, PM2_5, PM10 } = parsedMessage;
 
@@ -97,10 +105,33 @@ async function checkClient(Id) {
     }
 }
 
+// JSON-Schema für die erwarteten Felder
+const schema = {
+    type: "object",
+    properties: {
+        Id: { type: "string", pattern: "^[0-9]+$" }, // ID als String, nur numerische Zeichen erlaubt
+        PM1_0: { type: "number" },
+        PM2_5: { type: "number" },
+        PM10: { type: "number" }
+    },
+    required: ["Id", "PM1_0", "PM2_5", "PM10"],
+    additionalProperties: false // Blockiert unerwartete Felder
+};
+
+function validateMessage(data) {
+    const validate = ajv.compile(schema);
+    const valid = validate(data);
+    if (!valid) {
+        console.error('JSON-Validierungsfehler:', validate.errors);
+        return false;
+    }
+    console.log("Client gültig!")
+    return true;
+}
 
 //-----------------------------------------------------------------------------------
 //XXXXXXXXXX
 //Zur Simulation:
 //XXXXXXXXXXX
-const messageTEST = '{"Id":"11","PM1_0":0,"PM2_5":0,"PM10":34}';
+const messageTEST = '{"Id":"1","PM1_0":0,"PM2_5":0,"PM10":34}';
 uploadMessage(messageTEST);
