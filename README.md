@@ -1,7 +1,7 @@
 <h1>ToDo:</h1>
 
 DOKUMENTATION
-TESTEN MIT VERS: CLIENTIDs (+LUCAS GESENDETE CLIENTIDs)
+IP des Brokers automatisch anpassen/Reagieren
 
 <h2>ToDo-Verbesserungen im Code:</h2><br>
     MQTT-Überlastung (DDos Angriff mit "express-rate-limit")<br>
