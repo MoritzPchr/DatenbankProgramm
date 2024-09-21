@@ -6,7 +6,7 @@ const ajv = new Ajv();
 // MQTT Client konfigurieren
 //const client = mqtt.connect('mqtt://broker.hivemq.com'); // Beispeilsbroker IP
 //const client = mqtt.connect('mqtt://192.10.10.10');
-const client = mqtt.connect('mqtt://192.168.1.29:8883'); //--> mit Angabe des Portes
+const client = mqtt.connect('mqtt://172.20.10.7:8883'); //--> mit Angabe des Portes
 
 
 // Verbindung zur MySQL-Datenbank auf localhost (XAMPP)
@@ -41,7 +41,10 @@ client.on('connect', () => {
 // Nachricht empfangen
 client.on('message', (topic, message) => {
     console.log(`Received message: ${message.toString()} on topic: ${topic}`);
-    uploadMessage(message);
+    //Timeout von 5s um überlasten zu verhindern
+    setTimeout(function() {
+        uploadMessage(message);
+      }, 5000);
 });
 
 // Handle process exit to close DB connection
@@ -58,11 +61,10 @@ process.on('SIGINT', () => {
 //In die Datenbank speichern
 async function uploadMessage(message) {
     try {
-        const parsedMessage = JSON.parse(message.toString());
+        let parsedMessage = JSON.parse(message.toString());
 
         //JSON-Kontrolle:
         if (!validateMessage(parsedMessage)) {
-            console.error('Ungültiges JSON-Format:', parsedMessage);
             return;
         }
 
@@ -70,23 +72,20 @@ async function uploadMessage(message) {
         let { Id, PM1_0, PM2_5, PM10 } = parsedMessage;
 
         // Überprüfen ob Client existiert:
-        const clientExists = await checkClient(Id);
-        
-        if (clientExists) {
-            console.log("Client vorhanden");
+        let clientExists = await checkClient(Id);
 
-            // SQL-Abfrage zum Einfügen der Daten in die Datenbank
+        if (clientExists) {
+            console.log("Client vorhanden!");
+            // SQL zum Einfügen der Daten in die Datenbank
             let sql = `INSERT INTO feinstaubwert (\`PM1.0\`, \`PM2.5\`, PM10, ClientID) VALUES (?, ?, ?, ?)`;
             db.query(sql, [PM1_0, PM2_5, PM10, Id], (err, results) => {
                 if (err) {
                     console.error('Fehler beim Einfügen der Daten:', err.message);
                     return;
                 }
-                console.log(`Daten eingefügt mit ID: ${results.insertId}`);
+                console.log(`Daten eingefügt!`);
             });
-        } else {
-            console.log("Client nicht vorhanden!");
-        }
+        } 
     } catch (err) {
         console.error('Fehler beim Verarbeiten der Nachricht:', err.message);
     }
@@ -109,7 +108,7 @@ async function checkClient(Id) {
 const schema = {
     type: "object",
     properties: {
-        Id: { type: "string", pattern: "^[0-9]+$" }, // ID als String, nur numerische Zeichen erlaubt
+        Id: { type: "number" }, 
         PM1_0: { type: "number" },
         PM2_5: { type: "number" },
         PM10: { type: "number" }
@@ -125,13 +124,14 @@ function validateMessage(data) {
         console.error('JSON-Validierungsfehler:', validate.errors);
         return false;
     }
-    console.log("Client gültig!")
+    console.log("JSON gültig!")
     return true;
 }
 
 //-----------------------------------------------------------------------------------
 //XXXXXXXXXX
 //Zur Simulation:
-//XXXXXXXXXXX
+/*
 const messageTEST = '{"Id":"1","PM1_0":0,"PM2_5":0,"PM10":34}';
-uploadMessage(messageTEST);
+uploadMessage(messageTEST); 
+*/
