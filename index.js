@@ -38,16 +38,29 @@ client.on('connect', () => {
     });
 });
 
-// Nachricht empfangen
+
+// Nachricht empfangen und in die Warteschlange einfügen
+let messageQueue = [];
+const MAX_QUEUE_SIZE = 100; //maximale Paketgröße = 256 MB --> maximale Queue-Size = 25,6GB
+
 client.on('message', (topic, message) => {
     console.log(`Received message: ${message.toString()} on topic: ${topic}`);
-    //Timeout von 5s um überlasten zu verhindern
-    setTimeout(function() {
-        uploadMessage(message);
-      }, 5000);
+    if (messageQueue.length < MAX_QUEUE_SIZE) {
+        messageQueue.push(message); // Nachricht in die Warteschlange einfügen
+    } else {
+        console.error('Queue ist voll, Nachricht wird verworfen.');
+    }
 });
+// Intervall von 0,5 Sekunde zum Verarbeiten von Nachrichten
+setInterval(() => {
+    if (messageQueue.length > 0) {
+        const message = messageQueue.shift(); // Nächste Nachricht aus der Warteschlange entnehmen
+        uploadMessage(message);
+    }
+}, 500); // pro Sekunde werden 2 Nachrichten verarbeitet
 
-// Handle process exit to close DB connection
+
+//DB Verbindung schließen:
 process.on('SIGINT', () => {
     db.end((err) => {
         if (err) {
@@ -58,22 +71,19 @@ process.on('SIGINT', () => {
     });
 });
 
+
 //In die Datenbank speichern
 async function uploadMessage(message) {
     try {
         let parsedMessage = JSON.parse(message.toString());
-
         //JSON-Kontrolle:
         if (!validateMessage(parsedMessage)) {
             return;
         }
-
         // Extrahiere die Werte aus dem JSON
         let { Id, PM1_0, PM2_5, PM10 } = parsedMessage;
-
         // Überprüfen ob Client existiert:
         let clientExists = await checkClient(Id);
-
         if (clientExists) {
             console.log("Client vorhanden!");
             // SQL zum Einfügen der Daten in die Datenbank
@@ -85,11 +95,17 @@ async function uploadMessage(message) {
                 }
                 console.log(`Daten eingefügt!`);
             });
+        }
+        else{
+            console.log(`Client nicht vorhanden!`);
         } 
     } catch (err) {
         console.error('Fehler beim Verarbeiten der Nachricht:', err.message);
     }
 }
+
+
+
 
 async function checkClient(Id) {
     let sql = `SELECT EXISTS(SELECT 1 FROM client WHERE ClientID = ?) AS existsResult`;
@@ -104,7 +120,9 @@ async function checkClient(Id) {
     }
 }
 
-// JSON-Schema für die erwarteten Felder
+
+
+// JSON-Schema für die erwarteten Felder und JSON daran kontrollieren
 const schema = {
     type: "object",
     properties: {
@@ -116,7 +134,6 @@ const schema = {
     required: ["Id", "PM1_0", "PM2_5", "PM10"],
     additionalProperties: false // Blockiert unerwartete Felder
 };
-
 function validateMessage(data) {
     const validate = ajv.compile(schema);
     const valid = validate(data);
