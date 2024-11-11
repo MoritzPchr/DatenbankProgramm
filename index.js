@@ -6,7 +6,7 @@ const ajv = new Ajv();
 // MQTT Client konfigurieren
 //const client = mqtt.connect('mqtt://broker.hivemq.com'); // Beispeilsbroker IP
 //const client = mqtt.connect('mqtt://192.10.10.10');
-const client = mqtt.connect('mqtt://172.20.10.7:8883'); //--> mit Angabe des Portes
+const client = mqtt.connect('mqtt://192.168.178.185:8883'); //--> mit Angabe des Portes
 
 
 // Verbindung zur MySQL-Datenbank auf localhost (XAMPP)
@@ -28,7 +28,7 @@ db.connect((err) => {
 
 // Verbindung zum MQTT-Broker herstellen
 client.on('connect', () => {
-    console.log('Connected to MQTT broker');
+    console.log('Connecting to MQTT broker...');
     client.subscribe('sensor/pm', (err) => { //Topic angeben
         if (err) {
             console.error('Subscription error:', err);
