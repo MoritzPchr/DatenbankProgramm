@@ -1,0 +1,12 @@
+# Exported from Render on 2024-11-11T19:46:17Z
+databases:
+- name: Diplomarbeit
+  databaseName: diplomarbeit
+  user: diplomarbeit_user
+  plan: free
+  region: frankfurt
+  ipAllowList:
+  - source: 0.0.0.0/0
+    description: everywhere
+  postgresMajorVersion: "16"
+version: "1"
