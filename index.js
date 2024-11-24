@@ -2,20 +2,15 @@ const mqtt = require('mqtt');
 const mysql = require('mysql2');
 const Ajv = require('ajv');
 const ajv = new Ajv();
+const config = require('./config');
 
 // MQTT Client konfigurieren
-//const client = mqtt.connect('mqtt://broker.hivemq.com'); // Beispeilsbroker IP
 //const client = mqtt.connect('mqtt://192.10.10.10');
 const client = mqtt.connect('mqtt://192.168.178.185:8883'); //--> mit Angabe des Portes
 
 
-// Verbindung zur MySQL-Datenbank auf localhost (XAMPP)
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',           // Standardbenutzername für XAMPP
-    password: '',           // Standardpasswort für XAMPP ist leer, falls geändert, anpassen
-    database: 'diplomarbeit'   // Name der bestehenden Datenbank
-});
+// Verbindung zur externen MySQL-Datenbank herstellen mit config datei
+const db = mysql.createConnection(config.db);
 
 // Verbindung zur Datenbank herstellen
 db.connect((err) => {
@@ -148,7 +143,7 @@ function validateMessage(data) {
 //-----------------------------------------------------------------------------------
 //XXXXXXXXXX
 //Zur Simulation:
-/*
-const messageTEST = '{"Id":"1","PM1_0":0,"PM2_5":0,"PM10":34}';
+
+const messageTEST = '{"Id":1,"PM1_0":0,"PM2_5":0,"PM10":34}';
 uploadMessage(messageTEST); 
-*/
+
