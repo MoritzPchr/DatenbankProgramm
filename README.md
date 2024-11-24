@@ -1,6 +1,6 @@
 <h1>ToDo:</h1>
 
--DOKUMENTATION
+-DOKUMENTATION<br>
 -IP des Brokers automatisch anpassen/Reagieren
 
 <h2>ToDo-Verbesserungen im Code:</h2><br>
