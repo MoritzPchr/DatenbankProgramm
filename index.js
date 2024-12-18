@@ -140,6 +140,8 @@ function validateMessage(data) {
     return true;
 }
 
+
+
 //-----------------------------------------------------------------------------------
 //XXXXXXXXXX
 //Zur Simulation:
