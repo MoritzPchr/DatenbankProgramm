@@ -6,7 +6,7 @@ const config = require('./config');
 
 // MQTT Client konfigurieren
 //const client = mqtt.connect('mqtt://192.10.10.10');
-const client = mqtt.connect('mqtt://192.168.178.185:8883'); //--> mit Angabe des Portes
+const client = mqtt.connect('mqtt://172.20.10.7:8883'); //--> mit Angabe des Portes
 
 
 // Verbindung zur externen MySQL-Datenbank herstellen mit config datei
@@ -92,7 +92,7 @@ async function uploadMessage(message) {
             });
         }
         else{
-            console.log(`Client nicht vorhanden!`);
+            console.log(`Client nicht vorhanden - Daten nicht eingefügt`);
         } 
     } catch (err) {
         console.error('Fehler beim Verarbeiten der Nachricht:', err.message);
@@ -145,7 +145,7 @@ function validateMessage(data) {
 //-----------------------------------------------------------------------------------
 //XXXXXXXXXX
 //Zur Simulation:
-
+/*
 const messageTEST = '{"Id":1,"PM1_0":0,"PM2_5":0,"PM10":34}';
 uploadMessage(messageTEST); 
-
+*/
