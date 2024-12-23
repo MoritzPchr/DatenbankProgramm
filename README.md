@@ -2,7 +2,3 @@
 
 -DOKUMENTATION<br>
 -IP des Brokers automatisch anpassen/Reagieren
-
-<h2>ToDo-Verbesserungen im Code:</h2><br>
-    -Datenbankverbindungsdetails verstecken (mit dotenv) --> dann auf Oracle<br>
-
