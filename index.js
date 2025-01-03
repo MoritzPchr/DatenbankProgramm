@@ -1,6 +1,6 @@
-const mqtt = require('mqtt');
-const mysql = require('mysql2');
-const Ajv = require('ajv');
+const mqtt = require('mqtt');   //Für MQTT
+const mysql = require('mysql2');//Für MySQL-DB
+const Ajv = require('ajv'); //JSON Schema Validierung
 const ajv = new Ajv();
 const config = require('./config');
 
@@ -101,7 +101,7 @@ async function uploadMessage(message) {
 
 
 
-
+//Schauen ob Client existiert:
 async function checkClient(Id) {
     let sql = `SELECT EXISTS(SELECT 1 FROM client WHERE ClientID = ?) AS existsResult`;
 
@@ -126,12 +126,13 @@ const schema = {
         PM2_5: { type: "number" },
         PM10: { type: "number" }
     },
-    required: ["Id", "PM1_0", "PM2_5", "PM10"],
-    additionalProperties: false // Blockiert unerwartete Felder
+    required: ["Id", "PM1_0", "PM2_5", "PM10"], //alle Felder mussen da sein
+    additionalProperties: false // Blockiert unerwartete Felder --> keine anderen Properties
 };
 function validateMessage(data) {
+    //'ajv.compile(schema)' kompiliert das Schema, das das JSON-Dokuments definiert, zu einer ausführbaren Validierungsfunktion.
     const validate = ajv.compile(schema);
-    const valid = validate(data);
+    const valid = validate(data); //ob die Daten dem Schema entsprechen
     if (!valid) {
         console.error('JSON-Validierungsfehler:', validate.errors);
         return false;
